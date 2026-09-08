@@ -6,6 +6,10 @@
   <title>今日幸运签</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #667eea, #764ba2);
@@ -19,10 +23,12 @@
     .card {
       background: white;
       width: 400px;
+      max-width: 90%;
       padding: 40px;
       border-radius: 20px;
       text-align: center;
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transition: transform 0.3s;
     }
 
     h1 {
@@ -31,11 +37,12 @@
 
     #message {
       font-size: 22px;
-      min-height: 70px;
+      min-height: 90px;
       margin: 30px 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 10px;
     }
 
     button {
@@ -46,27 +53,75 @@
       border-radius: 10px;
       font-size: 18px;
       cursor: pointer;
+      transition: transform 0.2s, opacity 0.2s;
     }
 
     button:hover {
-      opacity: 0.85;
+      transform: scale(1.05);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* 抽签时摇晃 */
+    .shake {
+      animation: shake 0.7s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%   { transform: rotate(0deg); }
+      15%  { transform: rotate(-4deg); }
+      30%  { transform: rotate(4deg); }
+      45%  { transform: rotate(-4deg); }
+      60%  { transform: rotate(4deg); }
+      75%  { transform: rotate(-2deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    /* 幸运签出现 */
+    .show {
+      animation: showMessage 0.6s ease-out;
+    }
+
+    @keyframes showMessage {
+      0% {
+        opacity: 0;
+        transform: scale(0.5) rotateY(90deg);
+      }
+
+      60% {
+        opacity: 1;
+        transform: scale(1.08) rotateY(-10deg);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1) rotateY(0deg);
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="card">
+  <div class="card" id="card">
+
     <h1>🔮 今日幸运签</h1>
 
     <div id="message">
       点击下面的按钮，抽一张幸运签吧！
     </div>
 
-    <button onclick="drawFortune()">✨ 抽一张</button>
+    <button id="drawButton" onclick="drawFortune()">
+      ✨ 抽一张
+    </button>
+
   </div>
 
   <script>
+
     const fortunes = [
       "🌟 今天适合尝试一件新事情！",
       "🍀 好运正在向你靠近。",
@@ -75,13 +130,46 @@
       "🎯 专注做好一件事，你会有惊喜。",
       "🚀 大胆一点，你可能比自己想象的更优秀。",
       "😊 今天记得多笑一笑。",
-      "💡 一个新的想法可能改变很多事情。"
+      "💡 一个新的想法可能改变很多事情。",
+      "💰 今天可能会遇到意外的小惊喜！",
+      "❤️ 记得给重要的人发一条消息。",
+      "🌈 坚持一下，好事情正在路上。",
+      "🎉 今天值得庆祝一件小事！"
     ];
 
     function drawFortune() {
-      const randomIndex = Math.floor(Math.random() * fortunes.length);
-      document.getElementById("message").textContent = fortunes[randomIndex];
+
+      const card = document.getElementById("card");
+      const message = document.getElementById("message");
+      const button = document.getElementById("drawButton");
+
+      // 防止连续点击
+      button.disabled = true;
+
+      // 开始摇晃
+      card.classList.remove("shake");
+      message.classList.remove("show");
+
+      // 强制重新播放动画
+      void card.offsetWidth;
+
+      card.classList.add("shake");
+
+      // 等摇晃结束后显示结果
+      setTimeout(function() {
+
+        const randomIndex =
+          Math.floor(Math.random() * fortunes.length);
+
+        message.textContent = fortunes[randomIndex];
+
+        message.classList.add("show");
+
+        button.disabled = false;
+
+      }, 700);
     }
+
   </script>
 
 </body>
